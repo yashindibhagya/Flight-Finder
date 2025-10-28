@@ -1,8 +1,10 @@
+import { ImageBackground } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import GlassButton from '../components/buttons/getStartedButton';
 
-import { ImageBackground } from 'expo-image';
+const { width, height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
     const router = useRouter();
@@ -11,30 +13,31 @@ export default function WelcomeScreen() {
     return (
         <View style={styles.container}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+
             {/* Background Image */}
             <ImageBackground
                 source={frontImage}
                 style={styles.imageBackground}
-                resizeMode="contain"
-            />
+                resizeMode="cover"
+            >
+                {/* Content */}
+                <View style={styles.content}>
+                    <Text style={styles.title}>Finding the Best</Text>
+                    <Text style={[styles.title, { marginBottom: 16 }]}>Routes</Text>
 
-            {/* Overlay Content */}
-            <View style={styles.content}>
-                <Text style={styles.title}>Finding the Best</Text>
-                <Text style={styles.title}>Routes</Text>
+                    <View style={styles.subtitleContainer}>
+                        <Text style={styles.subtitle}>Your perfect flight is just moments away. Let's</Text>
+                        <Text style={styles.subtitle}>take off soon!</Text>
+                    </View>
 
-                <Text style={styles.subtitle}>Your perfect flight is just moments away. Let’s </Text>
-                <Text style={styles.subtitle}>take off soon!</Text>
-
-                {/* Get Started Button */}
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => router.push("selectOption/optionSignUp")}
-                >
-                    <Text style={styles.buttonText}>Get Started</Text>
-                </TouchableOpacity>
-
-            </View>
+                    {/* Get Started Button */}
+                    <GlassButton
+                        text="Get Started"
+                        onPress={() => router.push("auth/login")}
+                        style={styles.button}
+                    />
+                </View>
+            </ImageBackground>
         </View>
     );
 }
@@ -43,62 +46,47 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor: "#155658", // Dark green background
-        alignItems: "center",
-        justifyContent: "center",
+        backgroundColor: '#fff',
     },
     imageBackground: {
-        width: "100%",
-        height: "100%", // Reduce height so text is visible
-        position: "absolute", // Position image behind content
+        flex: 1,
+        width: '100%',
+        justifyContent: 'flex-end',
     },
     content: {
-        position: "absolute", // Place content over the image
-        bottom: 100, // Move content up
-        width: "100%",
-        alignItems: "center",
-        top: 650,
+        paddingHorizontal: 24,
+        paddingBottom: 60,
     },
     title: {
         fontSize: 34,
-        color: "#000",
-        fontFamily: "Poppins-Bold",
-        textAlign: "left",
-        top: -40,
+        color: '#000',
+        fontFamily: 'Poppins-Bold',
+        lineHeight: 50,
+        textShadowColor: 'rgba(0, 0, 0, 0.25)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
+        left: 10
+    },
+    subtitleContainer: {
+        marginBottom: 30,
+        left: 10
     },
     subtitle: {
         fontSize: 14,
-        color: "#000",
-        fontFamily: "Poppins-Regular",
-        textAlign: "left",
-        top: -40,
+        color: '#000',
+        fontFamily: 'Poppins-Regular',
+        lineHeight: 22,
+        textShadowColor: 'rgba(0, 0, 0, 0.25)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     button: {
-        backgroundColor: "#F5A623", // Yellow button color
-        paddingVertical: 14,
-        paddingHorizontal: 40,
-        borderRadius: 30,
-        marginTop: 20,
-        width: "80%",
-        alignItems: "center",
-        top: -60,
+        top: -10,
     },
     buttonText: {
         fontSize: 18,
-        fontWeight: "600",
-        color: "#fff",
-    },
-    linkText: {
-        fontSize: 14,
-        color: "#C0C0C0",
-        marginTop: 10,
-        textAlign: "center",
-        top: -60,
-    },
-    signInText: {
-        fontSize: 14,
-        color: "#C0C0C0",
-        textDecorationLine: "underline", // Underline only "Sign In"
-        fontWeight: "bold", // Make it stand out
+        fontFamily: 'Poppins-SemiBold',
+        color: '#fff',
+        textAlign: 'center',
     },
 });
