@@ -20,8 +20,11 @@ export default function WelcomeScreen() {
 
             {/* Overlay Content */}
             <View style={styles.content}>
-                <Text style={styles.title}>Welcome to</Text>
-                <Text style={styles.brand}>GestureConnect</Text>
+                <Text style={styles.title}>Finding the Best</Text>
+                <Text style={styles.title}>Routes</Text>
+
+                <Text style={styles.subtitle}>Your perfect flight is just moments away. Let’s </Text>
+                <Text style={styles.subtitle}>take off soon!</Text>
 
                 {/* Get Started Button */}
                 <TouchableOpacity
@@ -29,14 +32,6 @@ export default function WelcomeScreen() {
                     onPress={() => router.push("selectOption/optionSignUp")}
                 >
                     <Text style={styles.buttonText}>Get Started</Text>
-                </TouchableOpacity>
-
-                {/* Already have an account? (Link to Sign In Page) */}
-
-                <TouchableOpacity
-                    onPress={() => router.push("selectOption/optionSignIn")}
-                >
-                    <Text style={styles.linkText}>Already have an account?</Text>
                 </TouchableOpacity>
 
             </View>
@@ -65,16 +60,18 @@ const styles = StyleSheet.create({
         top: 650,
     },
     title: {
-        fontSize: 22,
-        color: "#fff",
-        fontWeight: "400",
+        fontSize: 34,
+        color: "#000",
+        fontFamily: "Poppins-Bold",
+        textAlign: "left",
         top: -40,
     },
-    brand: {
-        fontSize: 32,
-        fontWeight: "900",
-        color: "#fff",
-        top: -45,
+    subtitle: {
+        fontSize: 14,
+        color: "#000",
+        fontFamily: "Poppins-Regular",
+        textAlign: "left",
+        top: -40,
     },
     button: {
         backgroundColor: "#F5A623", // Yellow button color
