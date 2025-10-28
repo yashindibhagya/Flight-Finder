@@ -8,13 +8,13 @@ import { getStorage } from "firebase/storage";
 
 // Your Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyC194IEGnJ3hfH7xHvbUQfhILWfuFvIhqQ",
-    authDomain: "gestureconnect-8aa03.firebaseapp.com",
-    projectId: "gestureconnect-8aa03",
-    storageBucket: "gestureconnect-8aa03.firebasestorage.app",
-    messagingSenderId: "856668870109",
-    appId: "1:856668870109:web:8561fec2a8cadce7cd5234",
-    measurementId: "G-K6YQRG6TFV",
+    apiKey: "AIzaSyBB3JCa7g8nnrsHn4zRxI9uq9MIRTXqe7I",
+    authDomain: "flight-finder-ca6c7.firebaseapp.com",
+    projectId: "flight-finder-ca6c7",
+    storageBucket: "flight-finder-ca6c7.firebasestorage.app",
+    messagingSenderId: "843889958955",
+    appId: "1:843889958955:web:873332ada54c10af610a6e",
+    measurementId: "G-0ZK9DLQWFP"
 };
 
 // Initialize Firebase
