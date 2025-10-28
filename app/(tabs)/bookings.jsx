@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 const bookings = () => {
     return (
@@ -9,3 +9,5 @@ const bookings = () => {
 }
 
 export default bookings
+
+const styles = StyleSheet.create({})

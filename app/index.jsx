@@ -1,27 +1,107 @@
-import { StyleSheet, View } from 'react-native'
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import { ImageBackground } from 'expo-image';
 
-import { useRouter } from 'expo-router'
-import image from '../assets/images/loading_Image.png'
+export default function WelcomeScreen() {
+    const router = useRouter();
+    const frontImage = require('../assets/images/loading_Image.png');
 
-export default function index() {
-
-    const router = useRouter()
     return (
         <View style={styles.container}>
-            <Image source={image} style={styles.image} />
+            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+            {/* Background Image */}
+            <ImageBackground
+                source={frontImage}
+                style={styles.imageBackground}
+                resizeMode="contain"
+            />
+
+            {/* Overlay Content */}
+            <View style={styles.content}>
+                <Text style={styles.title}>Welcome to</Text>
+                <Text style={styles.brand}>GestureConnect</Text>
+
+                {/* Get Started Button */}
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => router.push("selectOption/optionSignUp")}
+                >
+                    <Text style={styles.buttonText}>Get Started</Text>
+                </TouchableOpacity>
+
+                {/* Already have an account? (Link to Sign In Page) */}
+
+                <TouchableOpacity
+                    onPress={() => router.push("selectOption/optionSignIn")}
+                >
+                    <Text style={styles.linkText}>Already have an account?</Text>
+                </TouchableOpacity>
+
+            </View>
         </View>
-    )
+    );
 }
 
+// Styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        //backgroundColor: "#155658", // Dark green background
+        alignItems: "center",
+        justifyContent: "center",
     },
-    image: {
-        width: '100%',
-        height: '100%',
+    imageBackground: {
+        width: "100%",
+        height: "100%", // Reduce height so text is visible
+        position: "absolute", // Position image behind content
     },
-})
+    content: {
+        position: "absolute", // Place content over the image
+        bottom: 100, // Move content up
+        width: "100%",
+        alignItems: "center",
+        top: 650,
+    },
+    title: {
+        fontSize: 22,
+        color: "#fff",
+        fontWeight: "400",
+        top: -40,
+    },
+    brand: {
+        fontSize: 32,
+        fontWeight: "900",
+        color: "#fff",
+        top: -45,
+    },
+    button: {
+        backgroundColor: "#F5A623", // Yellow button color
+        paddingVertical: 14,
+        paddingHorizontal: 40,
+        borderRadius: 30,
+        marginTop: 20,
+        width: "80%",
+        alignItems: "center",
+        top: -60,
+    },
+    buttonText: {
+        fontSize: 18,
+        fontWeight: "600",
+        color: "#fff",
+    },
+    linkText: {
+        fontSize: 14,
+        color: "#C0C0C0",
+        marginTop: 10,
+        textAlign: "center",
+        top: -60,
+    },
+    signInText: {
+        fontSize: 14,
+        color: "#C0C0C0",
+        textDecorationLine: "underline", // Underline only "Sign In"
+        fontWeight: "bold", // Make it stand out
+    },
+});

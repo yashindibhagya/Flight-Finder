@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 
-export default function signUp() {
+const signUp = () => {
     return (
         <View>
             <Text>signUp</Text>
         </View>
     )
 }
+
+export default signUp
 
 const styles = StyleSheet.create({})

@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 
 const index = () => {
     return (
@@ -9,3 +9,5 @@ const index = () => {
 }
 
 export default index
+
+const styles = StyleSheet.create({})
