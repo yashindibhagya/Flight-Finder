@@ -18,7 +18,7 @@ export default function WelcomeScreen() {
             <ImageBackground
                 source={frontImage}
                 style={styles.imageBackground}
-                resizeMode="cover"
+                contentFit="cover"
             >
                 {/* Content */}
                 <View style={styles.content}>
