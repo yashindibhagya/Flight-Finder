@@ -1,16 +1,17 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Image } from "expo-image";
+//import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    Image,
     ScrollView,
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/ui/Text";
@@ -137,25 +138,46 @@ const TabIndex = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-                {/* Header */}
-                <View style={styles.header}>
-                    <Image
-                        source={require("../../assets/images/wingairplane.jpg")}
-                        style={styles.upperImage}
-                    />
-
-                    <View>
-                        <Text style={styles.greeting}>Good Morning</Text>
-                        <Text style={styles.userName}>{userName}</Text>
+            <View style={styles.headerContainer}>
+                {/* Top Blue Header */}
+                <View style={styles.topHeader}>
+                    <View style={styles.headerContent}>
+                        <View style={styles.logoContainer}>
+                            <Image
+                                source={require("../../assets/images/wingairplane.jpg")}
+                                style={styles.logo}
+                                contentFit="contain"
+                            />
+                        </View>
+                        <View style={styles.headerTextContainer}>
+                            <Text style={styles.greeting}>Good Morning</Text>
+                            <Text style={styles.userName}>{userName}</Text>
+                        </View>
+                        <TouchableOpacity style={styles.profilePic}>
+                            <MaterialIcons name="person-outline" size={24} color="#fff" />
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.profilePic}>
-                        <MaterialIcons name="person-outline" size={24} color="#0E2A47" />
-                    </TouchableOpacity>
                 </View>
+                
+                {/* Search Form */}
+                <View style={styles.searchFormContainer}>
+                    <Text style={styles.searchTitle}>Where would you like to go?</Text>
+                    <Text style={styles.searchSubtitle}>Discover your next adventure</Text>
+                    
+                    <View style={styles.searchBox}>
+                        <MaterialIcons name="search" size={24} color="#666" />
+                        <TextInput
+                            style={styles.searchInput}
+                            placeholder="Search for a destination..."
+                            placeholderTextColor="#999"
+                        />
+                    </View>
+                </View>
+            </View>
+            
+            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
                 {/* Title */}
-                <Text style={styles.title}>Securely Book{"\n"}Your Flight Ticket</Text>
 
                 {/* Search Form */}
                 <View style={styles.form}>
@@ -353,22 +375,94 @@ const TabIndex = () => {
 export default TabIndex;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#0E2A47" },
-    scroll: { padding: 20 },
+    container: { flex: 1, backgroundColor: "#f5f5f5" },
+    scroll: { padding: 0, paddingBottom: 20 },
+    headerContainer: {
+        backgroundColor: '#0E2A47',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        paddingBottom: 20,
+        marginBottom: 20,
+    },
+    topHeader: {
+        paddingTop: 20,
+        paddingHorizontal: 20,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    headerTextContainer: {
+        flex: 1,
+        marginLeft: 15,
+    },
     header: { flexDirection: "row", justifyContent: "space-between", marginBottom: 25 },
-    greeting: { color: "#fff", fontSize: 14 },
-    userName: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+    greeting: { 
+        color: "rgba(255, 255, 255, 0.8)", 
+        fontSize: 14,
+        marginBottom: 2,
+    },
+    userName: { 
+        color: "#fff", 
+        fontSize: 16, 
+        fontWeight: "600" 
+    },
     profilePic: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: "#fff",
+        backgroundColor: "rgba(255, 255, 255, 0.2)",
         justifyContent: "center",
         alignItems: "center",
     },
-    upperImage: {
-        width: 100,
-        height: 60,
+    logoContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    logo: {
+        width: 30,
+        height: 30,
+        tintColor: '#fff',
+    },
+    searchFormContainer: {
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+    },
+    searchTitle: {
+        color: '#fff',
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    searchSubtitle: {
+        color: 'rgba(255, 255, 255, 0.8)',
+        fontSize: 14,
+        marginBottom: 20,
+    },
+    searchBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        height: 50,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+    },
+    searchInput: {
+        flex: 1,
+        marginLeft: 10,
+        fontSize: 16,
+        color: '#333',
     },
     title: {
         color: "#fff",
