@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "../../components/buttons/getStartedButton";
-import { registerUser } from "../../services/authService";
 
 /**
  * Sign Up screen for creating a new account
@@ -28,7 +27,7 @@ export default function SignUp() {
     const [loading, setLoading] = useState(false);
 
     // Handle sign up
-    const handleSignUp = async () => {
+    const handleSignUp = () => {
         // Validate input
         if (!name.trim()) {
             Alert.alert("Error", "Please enter your name");
@@ -52,11 +51,9 @@ export default function SignUp() {
 
         setLoading(true);
 
-        try {
-            // Register the user
-            await registerUser(email, password, name);
-
-            // Show success message and navigate to sign in
+        // Simulate async operation
+        setTimeout(() => {
+            setLoading(false);
             Alert.alert(
                 "Account Created",
                 "Your account has been successfully created!",
@@ -67,24 +64,7 @@ export default function SignUp() {
                     }
                 ]
             );
-        } catch (error) {
-            console.error("Registration error:", error);
-
-            // Handle specific error codes
-            let errorMessage = "Failed to create account.";
-
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage = "This email is already in use. Please use a different email or sign in.";
-            } else if (error.code === 'auth/invalid-email') {
-                errorMessage = "Invalid email address.";
-            } else if (error.code === 'auth/weak-password') {
-                errorMessage = "Password is too weak. Please choose a stronger password.";
-            }
-
-            Alert.alert("Sign Up Failed", errorMessage);
-        } finally {
-            setLoading(false);
-        }
+        }, 1000);
     };
 
     return (
@@ -112,7 +92,7 @@ export default function SignUp() {
                     {/* Header */}
                     <Text style={styles.heading}>Create New Account</Text>
                     <Text style={styles.subHeading}>
-                        Sign up now for free and start learning and translating signs to text
+                        Sign up now for free and start your journey
                     </Text>
 
                     {/* Form */}
@@ -221,7 +201,7 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
     lowerLeaves: {
-        //top: 10,
+        top: 30,
         height: 300,
         opacity: 0.4,
     },

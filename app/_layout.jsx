@@ -1,62 +1,7 @@
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
-import { UserDetailProvider, useUserDetail } from "../context/UserDetailContext";
-
-/**
- * AuthProvider component that handles authentication state and redirects
- */
-function AuthProvider({ children }) {
-  const { userDetail, isLoading } = useUserDetail();
-  const router = useRouter();
-  const segments = useSegments();
-  const [initialized, setInitialized] = useState(false);
-
-  useEffect(() => {
-    if (isLoading) return; // Wait for auth state to be determined
-
-    // Get the current segments, which represent the current route path
-    const inAuthGroup = segments[0] === 'auth';
-    const inTabsGroup = segments[0] === '(tabs)';
-    const isWelcomeScreen = segments.length === 1 && segments[0] === '';
-
-    // Basic logic:
-    // - If user is authenticated and trying to access auth screens, redirect to home
-    // - If user is not authenticated and trying to access protected screens, redirect to welcome
-    if (!initialized) {
-      setInitialized(true);
-      return;
-    }
-
-    if (userDetail) {
-      // User is signed in
-      if (inAuthGroup || isWelcomeScreen) {
-        // Redirect away from auth screens when already signed in
-        router.replace('/(tabs)/index');
-      }
-    } else {
-      // User is not signed in
-      if (inTabsGroup) {
-        // Redirect to welcome screen if trying to access protected tabs
-        router.replace('/');
-      }
-    }
-  }, [userDetail, isLoading, segments, initialized]);
-
-  // Show loading indicator while determining auth state
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#155658" />
-        <Text style={{ marginTop: 10 }}>Loading...</Text>
-      </View>
-    );
-  }
-
-  // Once auth state is determined, render the app
-  return <>{children}</>;
-}
+import React from "react";
+import { UserDetailProvider } from "../context/UserDetailContext";
 
 /**
  * Root layout component that provides context providers
@@ -65,16 +10,14 @@ function AuthProvider({ children }) {
 export default function RootLayout() {
   return (
     <UserDetailProvider>
-      <AuthProvider>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: '#D0F3DA' },
-            animation: 'slide_from_right',
-          }}
-        />
-      </AuthProvider>
+      <StatusBar style="dark" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#D0F3DA' },
+          animation: 'slide_from_right',
+        }}
+      />
     </UserDetailProvider>
   );
 }
