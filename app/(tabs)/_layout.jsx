@@ -5,6 +5,8 @@ import { View } from 'react-native';
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Fontisto from '@expo/vector-icons/Fontisto';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -95,33 +97,8 @@ export default function TabLayout() {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-              <IconSymbol
-                size={24}
-                name="paperplane.fill"
-                color={focused ? '#709DBA' : '#FFFFFF'}
-              />
-            </View>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-              backgroundColor: focused ? '#FFFFFF' : 'transparent',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-              <IconSymbol
-                size={24}
-                name="list.bullet"
-                color={focused ? '#709DBA' : '#FFFFFF'}
-              />
+              <Fontisto name="plane-ticket" size={24} color={focused ? '#709DBA' : '#FFFFFF'} />
+
             </View>
           ),
         }}
@@ -139,11 +116,7 @@ export default function TabLayout() {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-              <IconSymbol
-                size={24}
-                name="person.circle.fill"
-                color={focused ? '#709DBA' : '#FFFFFF'}
-              />
+              <FontAwesome name="user" size={24} color={focused ? '#709DBA' : '#FFFFFF'} />
             </View>
           ),
         }}
