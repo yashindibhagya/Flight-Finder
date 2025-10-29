@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const Profile = () => {
     const router = useRouter();
     const [user, setUser] = useState({
         id: '1',
-        name: 'Demo User',
-        email: 'demo@example.com',
+        name: 'Yashindi',
+        email: 'yashindi@gmail.com',
         phone: 'Not provided'
     });
 
@@ -19,6 +19,8 @@ const Profile = () => {
 
     return (
         <ScrollView style={styles.container}>
+            <StatusBar backgroundColor="#ffffffff" barStyle="dark-content" />
+
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>My Profile</Text>
             </View>
@@ -26,10 +28,10 @@ const Profile = () => {
             <View style={styles.profileSection}>
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatar}>
-                        <MaterialIcons name="person" size={60} color="#0A3D3F" />
+                        <MaterialIcons name="person" size={60} color="#0E2A47" />
                     </View>
                     <TouchableOpacity style={styles.editButton}>
-                        <MaterialIcons name="edit" size={18} color="#0A3D3F" />
+                        <MaterialIcons name="edit" size={18} color="#0E2A47" />
                     </TouchableOpacity>
                 </View>
 
@@ -38,30 +40,30 @@ const Profile = () => {
             </View>
 
             <View style={styles.menuContainer}>
-                <MenuItem 
-                    icon="person-outline" 
-                    title="Personal Information" 
-                    onPress={() => {}}
+                <MenuItem
+                    icon="person-outline"
+                    title="Personal Information"
+                    onPress={() => { }}
                 />
-                <MenuItem 
-                    icon="card-travel" 
-                    title="My Bookings" 
-                    onPress={() => {}}
+                <MenuItem
+                    icon="card-travel"
+                    title="My Bookings"
+                    onPress={() => { }}
                 />
-                <MenuItem 
-                    icon="notifications-none" 
-                    title="Notifications" 
-                    onPress={() => {}}
+                <MenuItem
+                    icon="notifications-none"
+                    title="Notifications"
+                    onPress={() => { }}
                 />
-                <MenuItem 
-                    icon="settings" 
-                    title="Settings" 
-                    onPress={() => {}}
+                <MenuItem
+                    icon="settings"
+                    title="Settings"
+                    onPress={() => { }}
                 />
-                <MenuItem 
-                    icon="help-outline" 
-                    title="Help & Support" 
-                    onPress={() => {}}
+                <MenuItem
+                    icon="help-outline"
+                    title="Help & Support"
+                    onPress={() => { }}
                 />
             </View>
 
@@ -78,7 +80,7 @@ const Profile = () => {
 const MenuItem = ({ icon, title, onPress }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
         <View style={styles.menuItemLeft}>
-            <MaterialIcons name={icon} size={24} color="#0A3D3F" />
+            <MaterialIcons name={icon} size={24} color="#0E2A47" />
             <Text style={styles.menuItemText}>{title}</Text>
         </View>
         <MaterialIcons name="chevron-right" size={24} color="#9CA3AF" />
@@ -91,6 +93,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F8FAFC',
+        paddingTop: 40
     },
     loadingContainer: {
         flex: 1,
@@ -107,7 +110,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#0A3D3F',
+        color: '#0E2A47',
         textAlign: 'center',
     },
     profileSection: {
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 3,
-        borderColor: '#0A3D3F',
+        borderColor: '#0E2A47',
     },
     editButton: {
         position: 'absolute',
@@ -138,12 +141,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 8,
         borderWidth: 2,
-        borderColor: '#0A3D3F',
+        borderColor: '#0E2A47',
     },
     userName: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#0A3D3F',
+        color: '#0E2A47',
         marginTop: 8,
     },
     userEmail: {

@@ -61,13 +61,13 @@ export default function SignIn() {
                 >
                     {/* Back Button */}
                     <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <MaterialIcons name="arrow-back" size={24} color="#0A3D3F" />
+                        <MaterialIcons name="arrow-back" size={24} color="#0E2A47" />
                     </TouchableOpacity>
 
                     {/* Hero Section with Illustration */}
                     <View style={styles.heroSection}>
                         <View style={styles.planeIconContainer}>
-                            <MaterialIcons name="flight" size={50} color="#0A3D3F" />
+                            <MaterialIcons name="flight" size={50} color="#0E2A47" />
                         </View>
                         <Text style={styles.greeting}>Welcome Back!</Text>
                         <Text style={styles.subGreeting}>
@@ -79,7 +79,7 @@ export default function SignIn() {
                     <View style={styles.formCard}>
                         {/* Email Input */}
                         <View style={styles.inputContainer}>
-                            <MaterialIcons name="email" size={20} color="#0A3D3F" style={styles.inputIcon} />
+                            <MaterialIcons name="email" size={20} color="#0E2A47" style={styles.inputIcon} />
                             <TextInput
                                 placeholder="Email Address"
                                 placeholderTextColor="#9CA3AF"
@@ -93,7 +93,7 @@ export default function SignIn() {
 
                         {/* Password Input */}
                         <View style={styles.inputContainer}>
-                            <MaterialIcons name="lock" size={20} color="#0A3D3F" style={styles.inputIcon} />
+                            <MaterialIcons name="lock" size={20} color="#0E2A47" style={styles.inputIcon} />
                             <TextInput
                                 placeholder="Password"
                                 placeholderTextColor="#9CA3AF"
@@ -141,13 +141,13 @@ export default function SignIn() {
                         {/* Social Login Options */}
                         <View style={styles.socialContainer}>
                             <TouchableOpacity style={styles.socialButton}>
-                                <MaterialIcons name="g-translate" size={24} color="#0A3D3F" />
+                                <MaterialIcons name="g-translate" size={24} color="#0E2A47" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.socialButton}>
-                                <MaterialIcons name="facebook" size={24} color="#0A3D3F" />
+                                <MaterialIcons name="facebook" size={24} color="#0E2A47" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.socialButton}>
-                                <MaterialIcons name="apple" size={24} color="#0A3D3F" />
+                                <MaterialIcons name="apple" size={24} color="#0E2A47" />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 20,
-        shadowColor: "#0A3D3F",
+        shadowColor: "#0E2A47",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.15,
         shadowRadius: 8,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: 32,
         fontWeight: "700",
-        color: "#0A3D3F",
+        color: "#0E2A47",
         marginBottom: 8,
     },
     subGreeting: {
@@ -263,19 +263,19 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     forgotPasswordText: {
-        color: "#0A3D3F",
+        color: "#0E2A47",
         fontSize: 14,
         fontWeight: "600",
     },
     signInButton: {
-        backgroundColor: "#0A3D3F",
+        backgroundColor: "#0E2A47",
         borderRadius: 12,
         paddingVertical: 16,
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
         gap: 8,
-        shadowColor: "#0A3D3F",
+        shadowColor: "#0E2A47",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
     },
     signUpLink: {
-        color: "#0A3D3F",
+        color: "#0E2A47",
         fontSize: 15,
         fontWeight: "700",
     },
