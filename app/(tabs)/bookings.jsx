@@ -1,9 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
+import { getBookingDetails } from '../../services/flightApi';
 
-// Sample booking data
-const bookingsData = [
+// Sample booking data (fallback in case API fails)
+const sampleBookings = [
     {
         id: '1',
         airline: 'SkyWings',
@@ -26,29 +28,6 @@ const bookingsData = [
         passengers: 1,
         bookingDate: '10 NOV 2023',
         bookingNumber: 'BK78945612',
-    },
-    {
-        id: '2',
-        airline: 'Oceanic',
-        flightNumber: 'OA 245',
-        departure: {
-            city: 'London',
-            code: 'LHR',
-            time: '14:15',
-            date: '22 NOV 2023',
-        },
-        arrival: {
-            city: 'New York',
-            code: 'JFK',
-            time: '17:30',
-            date: '22 NOV 2023',
-        },
-        duration: '8h 15m',
-        price: 520,
-        status: 'Confirmed',
-        passengers: 1,
-        bookingDate: '05 NOV 2023',
-        bookingNumber: 'BK45612378',
     },
 ];
 
@@ -119,39 +98,89 @@ const BookingCard = ({ booking }) => {
 
 const Bookings = () => {
     const router = useRouter();
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                setLoading(true);
+                // In a real app, you would fetch the user's booking references from your backend
+                // For now, we'll use a sample booking reference
+                const bookingReferences = ['BK78945612'];
+                
+                // Fetch all bookings in parallel
+                const bookingPromises = bookingReferences.map(ref => 
+                    getBookingDetails(ref).catch(err => {
+                        console.error(`Error fetching booking ${ref}:`, err);
+                        return null; // Return null for failed requests
+                    })
+                );
+
+                const bookingsData = await Promise.all(bookingPromises);
+                // Filter out any null values from failed requests
+                const validBookings = bookingsData.filter(booking => booking !== null);
+                
+                if (validBookings.length === 0 && bookingReferences.length > 0) {
+                    // If no bookings were fetched successfully, use sample data
+                    setBookings(sampleBookings);
+                    setError('Using sample data. Could not fetch real booking information.');
+                } else {
+                    setBookings(validBookings);
+                }
+            } catch (err) {
+                console.error('Error fetching bookings:', err);
+                setError('Failed to load bookings. Using sample data instead.');
+                setBookings(sampleBookings);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBookings();
+    }, []);
+
+    if (loading) {
+        return (
+            <View style={[styles.container, styles.centerContent]}>
+                <ActivityIndicator size="large" color="#0E2A47" />
+                <Text style={styles.loadingText}>Loading your bookings...</Text>
+            </View>
+        );
+    }
 
     return (
-
         <View style={styles.container}>
-            <StatusBar backgroundColor="#ffffffff" barStyle="dark-content" />
-
+            <StatusBar barStyle="dark-content" />
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>My Bookings</Text>
             </View>
 
-            {bookingsData.length > 0 ? (
-                <ScrollView
-                    style={styles.scrollView}
-                    contentContainerStyle={styles.scrollViewContent}
-                    showsVerticalScrollIndicator={false}
-                >
-                    {bookingsData.map((booking) => (
-                        <BookingCard key={booking.id} booking={booking} />
-                    ))}
-                </ScrollView>
-            ) : (
-                <View style={styles.emptyContainer}>
-                    <MaterialIcons name="airplanemode-inactive" size={64} color="#9CA3AF" />
-                    <Text style={styles.emptyTitle}>No Bookings Yet</Text>
-                    <Text style={styles.emptyText}>Your upcoming flight bookings will appear here</Text>
-                    <TouchableOpacity
-                        style={styles.exploreButton}
-                        onPress={() => router.push('/(tabs)')}
-                    >
-                        <Text style={styles.exploreButtonText}>Explore Flights</Text>
-                    </TouchableOpacity>
+            {error && (
+                <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
                 </View>
             )}
+            <ScrollView style={styles.scrollView}>
+                {bookings.length > 0 ? (
+                    bookings.map((booking) => (
+                        <BookingCard key={booking.id} booking={booking} />
+                    ))
+                ) : (
+                    <View style={styles.noBookingsContainer}>
+                        <MaterialIcons name="airplanemode-inactive" size={64} color="#9CA3AF" />
+                        <Text style={styles.noBookingsText}>No Bookings Yet</Text>
+                        <Text style={styles.noBookingsSubtext}>Your upcoming flight bookings will appear here</Text>
+                        <TouchableOpacity
+                            style={styles.exploreButton}
+                            onPress={() => router.push('/(tabs)')}
+                        >
+                            <Text style={styles.exploreButtonText}>Explore Flights</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </ScrollView>
         </View>
     );
 };
@@ -159,6 +188,45 @@ const Bookings = () => {
 export default Bookings;
 
 const styles = StyleSheet.create({
+    centerContent: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 16,
+        color: '#4B5563',
+        fontSize: 16,
+    },
+    errorContainer: {
+        backgroundColor: '#FEE2E2',
+        padding: 12,
+        margin: 16,
+        borderRadius: 8,
+        borderLeftWidth: 4,
+        borderLeftColor: '#DC2626',
+    },
+    errorText: {
+        color: '#B91C1C',
+        fontSize: 14,
+    },
+    noBookingsContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 40,
+        marginTop: 60,
+    },
+    noBookingsText: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#1F2937',
+        marginTop: 16,
+    },
+    noBookingsSubtext: {
+        fontSize: 14,
+        color: '#6B7280',
+        marginTop: 8,
+        textAlign: 'center',
+    },
     container: {
         flex: 1,
         backgroundColor: '#F8FAFC',

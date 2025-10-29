@@ -2,7 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 //import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -22,7 +22,7 @@ import { searchFlights as apiSearchFlights, hasRapidApiKey, searchAirports } fro
 const TabIndex = () => {
     const { userDetail } = useUserDetail();
     const router = useRouter();
-    const userName = userDetail?.name?.split(" ")[0] || "Traveler";
+    const userName = userDetail?.name?.split(" ")[0] || "Yashindi";
 
     const [origin, setOrigin] = useState("");
     const [destination, setDestination] = useState("");
@@ -35,6 +35,8 @@ const TabIndex = () => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [upcomingFlights, setUpcomingFlights] = useState([]);
+    const [isLoadingBookings, setIsLoadingBookings] = useState(false);
 
     const [originSuggestions, setOriginSuggestions] = useState([]);
     const [destinationSuggestions, setDestinationSuggestions] = useState([]);
@@ -83,6 +85,54 @@ const TabIndex = () => {
         setShowDestinationSuggestions(false);
     };
 
+    // Fetch upcoming flights from user's bookings
+    const fetchUpcomingFlights = async () => {
+        if (isSearching) return; // Don't fetch if we're in search mode
+
+        setIsLoadingBookings(true);
+        try {
+            // In a real app, you would fetch this from your backend
+            // For now, we'll use the same sample data as in bookings.jsx
+            const sampleBooking = {
+                id: `booking_${Date.now()}`,
+                airline: 'SkyWings',
+                flightNumber: 'SW 785',
+                departure: {
+                    city: 'New York',
+                    code: 'JFK',
+                    time: '08:30',
+                    date: '15 NOV 2023',
+                },
+                arrival: {
+                    city: 'London',
+                    code: 'LHR',
+                    time: '20:45',
+                    date: '15 NOV 2023',
+                },
+                duration: '7h 15m',
+                price: 450,
+                status: 'Confirmed',
+                passengers: 1,
+                bookingDate: '10 NOV 2023',
+                bookingNumber: `BK${Math.floor(10000000 + Math.random() * 90000000)}`,
+            };
+            setUpcomingFlights([sampleBooking]);
+        } catch (error) {
+            console.error('Error fetching upcoming flights:', error);
+            // In case of error, show no flights instead of sample data
+            setUpcomingFlights([]);
+        } finally {
+            setIsLoadingBookings(false);
+        }
+    };
+
+    // Load upcoming flights when component mounts and when not searching
+    useEffect(() => {
+        if (!isSearching) {
+            fetchUpcomingFlights();
+        }
+    }, [isSearching]);
+
     const handleSearch = async () => {
         if (!origin || !destination) {
             Alert.alert("Missing Info", "Please fill in all search fields.");
@@ -127,7 +177,7 @@ const TabIndex = () => {
                     <Text style={styles.flightRoute}>DEL - BOM</Text>
                 </View>
                 <View style={styles.priceContainer}>
-                    <Text style={styles.price}>₹{flight.price || '3,517'}</Text>
+                    <Text style={styles.price}>{flight.price || '3,517'}</Text>
                     <Text style={styles.priceLabel}>Price per person</Text>
                 </View>
             </View>
@@ -170,7 +220,11 @@ const TabIndex = () => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor="#ffffffff" barStyle="dark-content" />
-            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            <ScrollView
+                keyboardShouldPersistTaps="handled"
+                contentInset={{ bottom: 80 }}
+                contentContainerStyle={{ ...styles.scroll, paddingBottom: 80 }}
+            >
                 {/* Header */}
                 <View style={styles.header}>
                     <View style={styles.logoContainer}>
@@ -185,7 +239,8 @@ const TabIndex = () => {
                         <Text style={styles.greeting}>Good Morning</Text>
                         <Text style={styles.userName}>{userName}</Text>
                     </View>
-                    <TouchableOpacity style={styles.profilePic}>
+                    <TouchableOpacity style={styles.profilePic}
+                        onPress={() => router.push('/(tabs)/profile')}>
                         <MaterialIcons name="person-outline" size={24} color="#0E2A47" />
                     </TouchableOpacity>
                 </View>
@@ -365,21 +420,55 @@ const TabIndex = () => {
 
                 {/* Results Section */}
                 <View style={styles.upcoming}>
-                    <Text style={styles.upcomingTitle}>
-                        {isSearching ? "Available Flights" : "Upcoming Flights"}
-                    </Text>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.upcomingTitle}>
+                            {isSearching ? "Available Flights" : "Upcoming Flights"}
+                        </Text>
+                        {!isSearching && (
+                            <TouchableOpacity
+                                onPress={() => router.push('/(tabs)/bookings')}
+                                style={styles.viewAllButton}
+                            >
+                                <Text style={styles.viewAllText}>View All</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
 
-                    {loading ? (
-                        <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
-                    ) : results.length > 0 ? (
-                        results.map((flight, index) => renderFlightCard(flight, index))
-                    ) : isSearching ? (
-                        <Text style={styles.noResults}>No flights found. Try a different route.</Text>
-                    ) : (
-                        // Sample flight cards when no search has been performed
+                    {isSearching ? (
+                        // Show search results
                         <>
-                            {renderFlightCard({}, 1)}
-                            {renderFlightCard({ price: '4,215', airline: 'IndiGo' }, 2)}
+                            {loading ? (
+                                <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
+                            ) : results.length > 0 ? (
+                                results.map((flight, index) => renderFlightCard(flight, index))
+                            ) : (
+                                <Text style={styles.noResults}>No flights found. Try a different route.</Text>
+                            )}
+                        </>
+                    ) : (
+                        // Show upcoming flights
+                        <>
+                            {isLoadingBookings ? (
+                                <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
+                            ) : upcomingFlights.length > 0 ? (
+                                upcomingFlights.map((flight, index) => renderFlightCard({
+                                    ...flight,
+                                    // Map booking data to match the flight card props
+                                    price: typeof flight.price === 'number' ? `$${flight.price}` : flight.price,
+                                    departureTime: flight.departure?.time,
+                                    arrivalTime: flight.arrival?.time,
+                                    origin: flight.departure?.code,
+                                    destination: flight.arrival?.code,
+                                    date: flight.departure?.date,
+                                    // Add any other required mappings
+                                }, index))
+                            ) : (
+                                <View style={styles.noUpcomingContainer}>
+                                    <MaterialIcons name="flight" size={40} color="#9CA3AF" />
+                                    <Text style={styles.noUpcomingText}>No upcoming flights</Text>
+                                    <Text style={styles.noUpcomingSubtext}>Your upcoming trips will appear here</Text>
+                                </View>
+                            )}
                         </>
                     )}
                 </View>
@@ -389,6 +478,13 @@ const TabIndex = () => {
 };
 
 export default TabIndex;
+
+// Helper function to format date
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const options = { weekday: 'short', day: '2-digit', month: 'short' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+};
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#f7f7f7ff" },

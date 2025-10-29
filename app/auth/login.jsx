@@ -59,11 +59,6 @@ export default function SignIn() {
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                 >
-                    {/* Back Button */}
-                    <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                        <MaterialIcons name="arrow-back" size={24} color="#0E2A47" />
-                    </TouchableOpacity>
-
                     {/* Hero Section with Illustration */}
                     <View style={styles.heroSection}>
                         <View style={styles.planeIconContainer}>
@@ -198,7 +193,7 @@ const styles = StyleSheet.create({
     },
     heroSection: {
         alignItems: "center",
-        marginTop: 20,
+        marginTop: 30,
         marginBottom: 40,
     },
     planeIconContainer: {

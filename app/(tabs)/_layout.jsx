@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { Tabs } from 'expo-router/tabs';
 import React from 'react';
 import { View } from 'react-native';
 
@@ -7,9 +7,11 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
+import { useRouter } from 'expo-router';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const router = useRouter();
 
   return (
     <Tabs
@@ -17,7 +19,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: '#FFFFFF',
         tabBarInactiveTintColor: '#E0E7ED',
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarButton: (props) => <HapticTab {...props} onPress={() => {
+          // Handle tab press with router to prevent navigation issues
+          const route = props.to?.split('/').pop() || 'index';
+          router.replace(`/(tabs)/${route}`);
+        }} />,
         tabBarStyle: {
           position: 'absolute',
           bottom: 30,
@@ -28,7 +34,7 @@ export default function TabLayout() {
           backgroundColor: '#709DBA',
           borderRadius: 50,
           height: 65,
-          paddingBottom: 0,
+          paddingBottom: 10,
           paddingTop: 0,
           paddingHorizontal: 10,
           borderTopWidth: 0,
@@ -42,6 +48,7 @@ export default function TabLayout() {
           alignItems: 'center',
           justifyContent: 'center',
           marginLeft: 30,
+          marginBottom: 10,
         },
         tabBarLabelStyle: {
           display: 'none',
@@ -67,6 +74,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          href: '/',
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               width: 50,
@@ -90,6 +98,7 @@ export default function TabLayout() {
         name="bookings"
         options={{
           title: 'Bookings',
+          href: '/bookings',
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               width: 50,
@@ -110,6 +119,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
+          href: '/profile',
           tabBarIcon: ({ color, focused }) => (
             <View style={{
               width: 50,
