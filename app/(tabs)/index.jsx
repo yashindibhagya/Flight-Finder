@@ -1,6 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -10,25 +12,28 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import Button from "../../components/buttons/getStartedButton";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "../../components/ui/Text";
-import { Colors } from "../../constants/theme";
 import { useUserDetail } from "../../context/UserDetailContext";
 import { searchFlights as apiSearchFlights, hasRapidApiKey, searchAirports } from "../../services/flightApi";
 
 const TabIndex = () => {
     const { userDetail } = useUserDetail();
     const router = useRouter();
-    const userName = userDetail?.name?.split(' ')[0] || "Traveler";
+    const userName = userDetail?.name?.split(" ")[0] || "Traveler";
 
-    const [origin, setOrigin] = useState("New York (JFK)");
-    const [destination, setDestination] = useState("London (LHR)");
-    const [departDate, setDepartDate] = useState("2025-12-01"); // YYYY-MM-DD
+    const [origin, setOrigin] = useState("");
+    const [destination, setDestination] = useState("");
+    const [departDate, setDepartDate] = useState(new Date());
+    const [returnDate, setReturnDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [showReturnDatePicker, setShowReturnDatePicker] = useState(false);
+    const [tripType, setTripType] = useState('oneway');
+    const [passengers, setPassengers] = useState(1);
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
 
-    // Autocomplete state
     const [originSuggestions, setOriginSuggestions] = useState([]);
     const [destinationSuggestions, setDestinationSuggestions] = useState([]);
     const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
@@ -77,7 +82,7 @@ const TabIndex = () => {
     };
 
     const handleSearch = async () => {
-        if (!origin || !destination || !departDate) {
+        if (!origin || !destination) {
             Alert.alert("Missing Info", "Please fill in all search fields.");
             return;
         }
@@ -96,8 +101,7 @@ const TabIndex = () => {
             const fetchedResults = await apiSearchFlights(params);
             setResults(fetchedResults);
         } catch (error) {
-            console.error(error);
-            const msg = (error?.message || "Failed to fetch flights").slice(0, 200);
+            const msg = error?.message || "Failed to fetch flights";
             Alert.alert("Error", msg);
         } finally {
             setLoading(false);
@@ -114,7 +118,7 @@ const TabIndex = () => {
                 <Text weight="semiBold" style={styles.priceText}>
                     {flight.price}
                 </Text>
-                <MaterialIcons name="flight-takeoff" size={24} color={Colors.light.tint} />
+                <MaterialIcons name="flight-takeoff" size={24} color="#0E2A47" />
             </View>
             <View style={styles.cardDetailRow}>
                 <Text style={styles.detailLabel}>Duration:</Text>
@@ -132,287 +136,352 @@ const TabIndex = () => {
     );
 
     return (
-        <View style={styles.safeArea}>
-            <ScrollView contentContainerStyle={styles.container}>
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
                 {/* Header */}
                 <View style={styles.header}>
+                    <Image
+                        source={require("../../assets/images/wingairplane.jpg")}
+                        style={styles.upperImage}
+                    />
+
                     <View>
-                        <Text style={styles.greetingText} weight="regular">
-                            Welcome Back,
-                        </Text>
-                        <Text style={styles.userNameText} weight="bold">
-                            {userName}!
-                        </Text>
+                        <Text style={styles.greeting}>Good Morning</Text>
+                        <Text style={styles.userName}>{userName}</Text>
                     </View>
-                    <Link href="/(tabs)/profile" asChild>
-                        <TouchableOpacity style={styles.profileButton}>
-                            <MaterialIcons name="person-outline" size={24} color="#155658" />
-                        </TouchableOpacity>
-                    </Link>
+                    <TouchableOpacity style={styles.profilePic}>
+                        <MaterialIcons name="person-outline" size={24} color="#0E2A47" />
+                    </TouchableOpacity>
                 </View>
 
-                {/* Flight Search Form */}
-                <View style={styles.searchContainer}>
-                    <Text style={styles.sectionTitle} weight="semiBold">
-                        Find Your Next Flight
-                    </Text>
+                {/* Title */}
+                <Text style={styles.title}>Securely Book{"\n"}Your Flight Ticket</Text>
 
+                {/* Search Form */}
+                <View style={styles.form}>
+                    {/* Origin */}
                     <View style={styles.inputGroup}>
-                        <MaterialIcons name="flight-takeoff" size={20} color="#555" style={styles.inputIcon} />
+                        <MaterialIcons name="flight-takeoff" size={20} color="#0E2A47" />
                         <TextInput
                             style={styles.input}
-                            placeholder="Origin (e.g., JFK)"
+                            placeholder="From"
                             value={origin}
                             onChangeText={handleOriginChange}
-                            onFocus={() => setShowOriginSuggestions(true)}
-                            onBlur={() => setTimeout(() => setShowOriginSuggestions(false), 150)}
                         />
                     </View>
                     {showOriginSuggestions && originSuggestions.length > 0 && (
                         <View style={styles.suggestionsContainer}>
                             {originSuggestions.map((s) => (
-                                <TouchableOpacity key={`${s.skyId}-${s.entityId}`} style={styles.suggestionItem} onPress={() => selectOriginSuggestion(s)}>
-                                    <Text weight="medium" style={styles.suggestionTitle}>{s.suggestionTitle || s.title}</Text>
-                                    {s.subtitle ? <Text style={styles.suggestionSubtitle}>{s.subtitle}</Text> : null}
+                                <TouchableOpacity
+                                    key={`${s.skyId}-${s.entityId}`}
+                                    style={styles.suggestionItem}
+                                    onPressIn={() => selectOriginSuggestion(s)}
+                                >
+                                    <Text weight="medium" style={styles.suggestionTitle}>
+                                        {s.suggestionTitle || s.title}
+                                    </Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
                     )}
 
+                    {/* Destination */}
                     <View style={styles.inputGroup}>
-                        <MaterialIcons name="flight-land" size={20} color="#555" style={styles.inputIcon} />
+                        <MaterialIcons name="flight-land" size={20} color="#0E2A47" />
                         <TextInput
                             style={styles.input}
-                            placeholder="Destination (e.g., LHR)"
+                            placeholder="To"
                             value={destination}
                             onChangeText={handleDestinationChange}
-                            onFocus={() => setShowDestinationSuggestions(true)}
-                            onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 150)}
                         />
                     </View>
                     {showDestinationSuggestions && destinationSuggestions.length > 0 && (
                         <View style={styles.suggestionsContainer}>
                             {destinationSuggestions.map((s) => (
-                                <TouchableOpacity key={`${s.skyId}-${s.entityId}`} style={styles.suggestionItem} onPress={() => selectDestinationSuggestion(s)}>
-                                    <Text weight="medium" style={styles.suggestionTitle}>{s.suggestionTitle || s.title}</Text>
-                                    {s.subtitle ? <Text style={styles.suggestionSubtitle}>{s.subtitle}</Text> : null}
+                                <TouchableOpacity
+                                    key={`${s.skyId}-${s.entityId}`}
+                                    style={styles.suggestionItem}
+                                    onPressIn={() => selectDestinationSuggestion(s)}
+                                >
+                                    <Text weight="medium" style={styles.suggestionTitle}>
+                                        {s.suggestionTitle || s.title}
+                                    </Text>
                                 </TouchableOpacity>
                             ))}
                         </View>
                     )}
 
-                    <View style={styles.inputGroup}>
-                        <MaterialIcons name="calendar-today" size={18} color="#555" style={styles.inputIcon} />
-                        {/* Note: In a real RN app, you would use a DatePicker component here */}
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Departure Date (YYYY-MM-DD)"
-                            value={departDate}
-                            onChangeText={setDepartDate}
-                            keyboardType="numbers-and-punctuation"
-                        />
+                    {/* Trip Type */}
+                    <View style={styles.radioGroup}>
+                        <TouchableOpacity
+                            style={[styles.radioButton, tripType === 'oneway' && styles.radioButtonActive]}
+                            onPress={() => setTripType('oneway')}
+                        >
+                            <Text style={[styles.radioText, tripType === 'oneway' && styles.radioTextActive]}>One Way</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.radioButton, tripType === 'roundtrip' && styles.radioButtonActive]}
+                            onPress={() => setTripType('roundtrip')}
+                        >
+                            <Text style={[styles.radioText, tripType === 'roundtrip' && styles.radioTextActive]}>Round Trip</Text>
+                        </TouchableOpacity>
                     </View>
 
-                    <Button
-                        text={loading ? "Searching..." : "Search Flights"}
-                        onPress={handleSearch}
-                        loading={loading}
-                    />
+                    {/* Departure Date */}
+                    <View style={styles.dateRow}>
+                        <View style={[styles.inputGroup, styles.dateInputGroup]}>
+                            <MaterialIcons name="calendar-today" size={18} color="#0E2A47" />
+                            <View style={{ flex: 1, marginLeft: 10 }}>
+                                <Text style={styles.dateLabel}>Departure</Text>
+                                <TouchableOpacity
+                                    onPress={() => setShowDatePicker(true)}
+                                >
+                                    <Text style={styles.dateText}>
+                                        {departDate.toDateString()}
+                                    </Text>
+                                </TouchableOpacity>
+                                {showDatePicker && (
+                                    <DateTimePicker
+                                        value={departDate}
+                                        mode="date"
+                                        display="default"
+                                        onChange={(event, selectedDate) => {
+                                            setShowDatePicker(false);
+                                            if (selectedDate) {
+                                                setDepartDate(selectedDate);
+                                                // If return date is before departure date, update it
+                                                if (selectedDate > returnDate) {
+                                                    setReturnDate(selectedDate);
+                                                }
+                                            }
+                                        }}
+                                        minimumDate={new Date()}
+                                    />
+                                )}
+                            </View>
+                        </View>
+
+                        {/* Return Date - Only show for round trip */}
+                        {tripType === 'roundtrip' && (
+                            <View style={[styles.inputGroup, styles.dateInputGroup, { marginLeft: 10 }]}>
+                                <MaterialIcons name="calendar-today" size={18} color="#0E2A47" />
+                                <View style={{ flex: 1, marginLeft: 10 }}>
+                                    <Text style={styles.dateLabel}>Return</Text>
+                                    <TouchableOpacity
+                                        onPress={() => setShowReturnDatePicker(true)}
+                                    >
+                                        <Text style={styles.dateText}>
+                                            {returnDate.toDateString()}
+                                        </Text>
+                                    </TouchableOpacity>
+                                    {showReturnDatePicker && (
+                                        <DateTimePicker
+                                            value={returnDate}
+                                            mode="date"
+                                            display="default"
+                                            onChange={(event, selectedDate) => {
+                                                setShowReturnDatePicker(false);
+                                                if (selectedDate) {
+                                                    setReturnDate(selectedDate);
+                                                }
+                                            }}
+                                            minimumDate={departDate}
+                                        />
+                                    )}
+                                </View>
+                            </View>
+                        )}
+                    </View>
+
+                    {/* Passengers */}
+                    <View style={styles.inputGroup}>
+                        <MaterialIcons name="person-outline" size={20} color="#0E2A47" />
+                        <View style={{ flex: 1, marginLeft: 10 }}>
+                            <Text style={styles.dateLabel}>Passengers</Text>
+                            <View style={styles.passengerSelector}>
+                                <TouchableOpacity
+                                    style={styles.passengerButton}
+                                    onPress={() => setPassengers(Math.max(1, passengers - 1))}
+                                >
+                                    <Text style={styles.passengerButtonText}>-</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.passengerCount}>{passengers}</Text>
+                                <TouchableOpacity
+                                    style={styles.passengerButton}
+                                    onPress={() => setPassengers(passengers + 1)}
+                                >
+                                    <Text style={styles.passengerButtonText}>+</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+
+                    {/* Search Button */}
+                    <TouchableOpacity style={styles.button} onPress={handleSearch} disabled={loading}>
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.buttonText}>Search Flight</Text>
+                        )}
+                    </TouchableOpacity>
                 </View>
 
                 {/* Results Section */}
-                <View style={styles.resultsSection}>
-                    <Text style={styles.sectionTitle} weight="bold">
-                        {isSearching ? "Search Results" : "Top Destinations"}
+                <View style={styles.upcoming}>
+                    <Text style={styles.upcomingTitle}>
+                        {isSearching ? "Available Flights" : "Upcoming Flights"}
                     </Text>
 
                     {loading ? (
-                        <View style={styles.loadingContainer}>
-                            <ActivityIndicator size="large" color={Colors.light.tint} />
-                            <Text style={styles.loadingText}>Searching the skies...</Text>
-                        </View>
+                        <ActivityIndicator size="large" color="#fff" style={{ marginTop: 15 }} />
                     ) : results.length > 0 ? (
-                        <View style={styles.resultsList}>
-                            {results.map(renderFlightCard)}
-                        </View>
+                        results.map(renderFlightCard)
                     ) : isSearching ? (
-                        <Text style={styles.noResultsText}>No direct flights found. Try adjusting your dates.</Text>
+                        <Text style={styles.noResults}>No flights found. Try a different route.</Text>
                     ) : (
-                        // Placeholder for initial load / no search done
-                        <View style={styles.placeholderContainer}>
-                            <Text weight="medium" style={styles.placeholderItem}>New York to Tokyo - $850</Text>
-                            <Text weight="medium" style={styles.placeholderItem}>London to Paris - $120</Text>
-                            <Text weight="medium" style={styles.placeholderItem}>Sydney to Dubai - $990</Text>
+                        <View style={styles.flightCard}>
+                            <Text style={styles.airline}>Qatar Airways</Text>
+                            <Text style={styles.price}>₹3,517</Text>
                         </View>
                     )}
                 </View>
             </ScrollView>
-        </View>
+        </SafeAreaView>
     );
 };
 
 export default TabIndex;
 
 const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#D0F3DA',
-    },
-    container: {
-        flexGrow: 1,
-        paddingTop: 50,
-        paddingHorizontal: 20,
-        paddingBottom: 100,
-    },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 30,
-    },
-    greetingText: {
-        fontSize: 18,
-        color: '#555',
-    },
-    userNameText: {
-        fontSize: 24,
-        color: '#155658',
-    },
-    profileButton: {
+    container: { flex: 1, backgroundColor: "#0E2A47" },
+    scroll: { padding: 20 },
+    header: { flexDirection: "row", justifyContent: "space-between", marginBottom: 25 },
+    greeting: { color: "#fff", fontSize: 14 },
+    userName: { color: "#fff", fontSize: 18, fontWeight: "bold" },
+    profilePic: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#fff',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
     },
-    searchContainer: {
-        backgroundColor: '#E6FFE6',
-        borderRadius: 20,
+    upperImage: {
+        width: 100,
+        height: 60,
+    },
+    title: {
+        color: "#fff",
+        fontSize: 22,
+        fontWeight: "bold",
+        marginBottom: 25,
+        lineHeight: 28,
+    },
+    form: {
+        backgroundColor: "#fff",
+        borderRadius: 25,
         padding: 20,
-        marginBottom: 30,
-        elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        color: '#155658',
-        marginBottom: 20,
-        textAlign: 'center',
+        marginBottom: 25,
     },
     inputGroup: {
+        flexDirection: "row",
+        alignItems: "center",
+        backgroundColor: "#F5F5F5",
+        borderRadius: 15,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+        height: 55,
+    },
+    input: { flex: 1, marginLeft: 10, fontSize: 15, color: "#000" },
+    dateInput: { flex: 1, justifyContent: 'center' },
+    dateRow: { flexDirection: 'row', marginBottom: 15 },
+    dateInputGroup: { flex: 1, height: 'auto', paddingVertical: 10 },
+    dateLabel: { fontSize: 12, color: '#666', marginBottom: 2 },
+    dateText: { fontSize: 15, color: '#000' },
+    radioGroup: {
+        flexDirection: 'row',
+        backgroundColor: '#F5F5F5',
+        borderRadius: 15,
+        padding: 5,
+        marginBottom: 15,
+    },
+    radioButton: {
+        flex: 1,
+        paddingVertical: 10,
+        alignItems: 'center',
+        borderRadius: 10,
+    },
+    radioButtonActive: {
+        backgroundColor: '#0E2A47',
+    },
+    radioText: {
+        color: '#666',
+        fontWeight: '500',
+    },
+    radioTextActive: {
+        color: '#fff',
+    },
+    passengerSelector: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        marginBottom: 15,
-        paddingHorizontal: 15,
-        borderWidth: 1,
-        borderColor: '#B0D0B0',
     },
-    inputIcon: {
-        marginRight: 10,
+    passengerButton: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: '#E8E8E8',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    input: {
-        flex: 1,
-        height: 50,
+    passengerButtonText: {
+        fontSize: 18,
+        color: '#0E2A47',
+        lineHeight: 20,
+    },
+    passengerCount: {
+        marginHorizontal: 15,
         fontSize: 16,
-        fontFamily: 'Poppins-Regular',
-        color: '#333',
+        color: '#000',
+        minWidth: 20,
+        textAlign: 'center',
     },
-    resultsSection: {
-        paddingHorizontal: 10,
+    button: {
+        backgroundColor: "#0E2A47",
+        paddingVertical: 15,
+        borderRadius: 15,
+        alignItems: "center",
+        marginTop: 10,
     },
+    buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+    upcoming: { marginTop: 10 },
+    upcomingTitle: { color: "#fff", fontWeight: "600", fontSize: 16, marginBottom: 10 },
+    flightCard: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        backgroundColor: "#fff",
+        borderRadius: 15,
+        padding: 15,
+        marginTop: 10,
+    },
+    airline: { color: "#0E2A47", fontWeight: "600" },
+    price: { color: "#0E2A47", fontWeight: "bold" },
+    cardHeader: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 5,
+    },
+    priceText: { fontSize: 18, color: "#0E2A47", fontWeight: "bold" },
+    cardDetailRow: { flexDirection: "row", justifyContent: "space-between" },
+    detailLabel: { color: "#555", fontSize: 14 },
+    noResults: { color: "#BFD6FF", textAlign: "center", marginTop: 20 },
     suggestionsContainer: {
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
         borderRadius: 10,
         marginTop: -10,
         marginBottom: 10,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
-        overflow: 'hidden',
+        borderColor: "#E0E0E0",
     },
-    suggestionItem: {
-        paddingHorizontal: 15,
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-    },
-    suggestionTitle: {
-        color: '#155658',
-    },
-    suggestionSubtitle: {
-        color: '#777',
-        fontSize: 12,
-        marginTop: 2,
-    },
-    loadingContainer: {
-        alignItems: 'center',
-        paddingVertical: 30,
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#155658',
-    },
-    resultsList: {
-        gap: 15,
-    },
-    flightCard: {
-        backgroundColor: '#fff',
-        padding: 15,
-        borderRadius: 15,
-        borderLeftWidth: 5,
-        borderLeftColor: Colors.light.tint,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-        paddingBottom: 5,
-    },
-    priceText: {
-        fontSize: 22,
-        color: Colors.light.tint,
-    },
-    cardDetailRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 5,
-    },
-    detailLabel: {
-        color: '#777',
-        fontSize: 14,
-    },
-    noResultsText: {
-        textAlign: 'center',
-        color: '#777',
-        marginTop: 20,
-    },
-    placeholderContainer: {
-        marginTop: 10,
-        padding: 15,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 10,
-        gap: 8,
-    },
-    placeholderItem: {
-        color: '#444',
-    }
+    suggestionItem: { padding: 10 },
+    suggestionTitle: { color: "#0E2A47" },
 });
