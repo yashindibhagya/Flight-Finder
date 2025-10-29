@@ -1,6 +1,6 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -14,7 +14,7 @@ import Button from "../../components/buttons/getStartedButton";
 import { Text } from "../../components/ui/Text";
 import { Colors } from "../../constants/theme";
 import { useUserDetail } from "../../context/UserDetailContext";
-import { searchFlights as apiSearchFlights, hasRapidApiKey } from "../../services/flightApi";
+import { searchFlights as apiSearchFlights, hasRapidApiKey, searchAirports } from "../../services/flightApi";
 
 const TabIndex = () => {
     const { userDetail } = useUserDetail();
@@ -27,6 +27,54 @@ const TabIndex = () => {
     const [loading, setLoading] = useState(false);
     const [results, setResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+
+    // Autocomplete state
+    const [originSuggestions, setOriginSuggestions] = useState([]);
+    const [destinationSuggestions, setDestinationSuggestions] = useState([]);
+    const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
+    const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
+    const originDebounceRef = useRef(null);
+    const destinationDebounceRef = useRef(null);
+
+    const handleOriginChange = (text) => {
+        setOrigin(text);
+        setShowOriginSuggestions(true);
+        if (originDebounceRef.current) clearTimeout(originDebounceRef.current);
+        originDebounceRef.current = setTimeout(async () => {
+            try {
+                const list = await searchAirports(text);
+                setOriginSuggestions(list);
+            } catch (e) {
+                setOriginSuggestions([]);
+            }
+        }, 350);
+    };
+
+    const handleDestinationChange = (text) => {
+        setDestination(text);
+        setShowDestinationSuggestions(true);
+        if (destinationDebounceRef.current) clearTimeout(destinationDebounceRef.current);
+        destinationDebounceRef.current = setTimeout(async () => {
+            try {
+                const list = await searchAirports(text);
+                setDestinationSuggestions(list);
+            } catch (e) {
+                setDestinationSuggestions([]);
+            }
+        }, 350);
+    };
+
+    const selectOriginSuggestion = (item) => {
+        const label = item.suggestionTitle || `${item.title} (${item.skyId})`;
+        setOrigin(label);
+        setShowOriginSuggestions(false);
+    };
+
+    const selectDestinationSuggestion = (item) => {
+        const label = item.suggestionTitle || `${item.title} (${item.skyId})`;
+        setDestination(label);
+        setShowDestinationSuggestions(false);
+    };
 
     const handleSearch = async () => {
         if (!origin || !destination || !departDate) {
@@ -115,9 +163,21 @@ const TabIndex = () => {
                             style={styles.input}
                             placeholder="Origin (e.g., JFK)"
                             value={origin}
-                            onChangeText={setOrigin}
+                            onChangeText={handleOriginChange}
+                            onFocus={() => setShowOriginSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowOriginSuggestions(false), 150)}
                         />
                     </View>
+                    {showOriginSuggestions && originSuggestions.length > 0 && (
+                        <View style={styles.suggestionsContainer}>
+                            {originSuggestions.map((s) => (
+                                <TouchableOpacity key={`${s.skyId}-${s.entityId}`} style={styles.suggestionItem} onPress={() => selectOriginSuggestion(s)}>
+                                    <Text weight="medium" style={styles.suggestionTitle}>{s.suggestionTitle || s.title}</Text>
+                                    {s.subtitle ? <Text style={styles.suggestionSubtitle}>{s.subtitle}</Text> : null}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
 
                     <View style={styles.inputGroup}>
                         <MaterialIcons name="flight-land" size={20} color="#555" style={styles.inputIcon} />
@@ -125,9 +185,21 @@ const TabIndex = () => {
                             style={styles.input}
                             placeholder="Destination (e.g., LHR)"
                             value={destination}
-                            onChangeText={setDestination}
+                            onChangeText={handleDestinationChange}
+                            onFocus={() => setShowDestinationSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 150)}
                         />
                     </View>
+                    {showDestinationSuggestions && destinationSuggestions.length > 0 && (
+                        <View style={styles.suggestionsContainer}>
+                            {destinationSuggestions.map((s) => (
+                                <TouchableOpacity key={`${s.skyId}-${s.entityId}`} style={styles.suggestionItem} onPress={() => selectDestinationSuggestion(s)}>
+                                    <Text weight="medium" style={styles.suggestionTitle}>{s.suggestionTitle || s.title}</Text>
+                                    {s.subtitle ? <Text style={styles.suggestionSubtitle}>{s.subtitle}</Text> : null}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
 
                     <View style={styles.inputGroup}>
                         <MaterialIcons name="calendar-today" size={18} color="#555" style={styles.inputIcon} />
@@ -258,6 +330,29 @@ const styles = StyleSheet.create({
     },
     resultsSection: {
         paddingHorizontal: 10,
+    },
+    suggestionsContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        marginTop: -10,
+        marginBottom: 10,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        overflow: 'hidden',
+    },
+    suggestionItem: {
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
+    },
+    suggestionTitle: {
+        color: '#155658',
+    },
+    suggestionSubtitle: {
+        color: '#777',
+        fontSize: 12,
+        marginTop: 2,
     },
     loadingContainer: {
         alignItems: 'center',

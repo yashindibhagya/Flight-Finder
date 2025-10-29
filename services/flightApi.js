@@ -74,6 +74,31 @@ export const resolveAirport = async (query) => {
     return result;
 };
 
+// Return a list of airports/cities for typeahead
+export const searchAirports = async (query) => {
+    const q = (query || '').trim();
+    if (!q) return [];
+    // light cache: reuse resolveAirport cache for exact tokens
+    try {
+        const data = await fetchJSON('/api/v1/flights/searchAirport', {
+            query: q,
+            locale: 'en-US',
+        });
+        const items = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+        return items.slice(0, 10).map((it) => ({
+            skyId: it.skyId || it.skyid || it.sky_id || it.navigation?.relevantFlightParams?.skyId,
+            entityId: it.entityId || it.entity_id || it.navigation?.relevantFlightParams?.entityId,
+            title: it.presentation?.title || it.navigation?.localizedName || it.name || q,
+            suggestionTitle: it.presentation?.suggestionTitle || undefined,
+            subtitle: it.presentation?.subtitle || undefined,
+            type: it.navigation?.entityType || 'AIRPORT',
+        })).filter(x => x.skyId && x.entityId);
+    } catch (e) {
+        // Surface empty to UI; errors are handled by caller if needed
+        return [];
+    }
+};
+
 export const searchFlights = async ({ origin, destination, departDate }) => {
     if (!RAPIDAPI_KEY) throw new Error('RapidAPI key missing. Set EXPO_PUBLIC_RAPIDAPI_KEY.');
 
