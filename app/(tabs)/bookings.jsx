@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View, ActivityIndicator } from 'react-native';
 import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getBookingDetails } from '../../services/flightApi';
 
 // Sample booking data (fallback in case API fails)
@@ -109,9 +109,9 @@ const Bookings = () => {
                 // In a real app, you would fetch the user's booking references from your backend
                 // For now, we'll use a sample booking reference
                 const bookingReferences = ['BK78945612'];
-                
+
                 // Fetch all bookings in parallel
-                const bookingPromises = bookingReferences.map(ref => 
+                const bookingPromises = bookingReferences.map(ref =>
                     getBookingDetails(ref).catch(err => {
                         console.error(`Error fetching booking ${ref}:`, err);
                         return null; // Return null for failed requests
@@ -121,7 +121,7 @@ const Bookings = () => {
                 const bookingsData = await Promise.all(bookingPromises);
                 // Filter out any null values from failed requests
                 const validBookings = bookingsData.filter(booking => booking !== null);
-                
+
                 if (validBookings.length === 0 && bookingReferences.length > 0) {
                     // If no bookings were fetched successfully, use sample data
                     setBookings(sampleBookings);
@@ -262,6 +262,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 8,
         elevation: 3,
+        marginLeft: 16,
+        marginRight: 16,
+        marginTop: 16,
     },
     cardHeader: {
         flexDirection: 'row',
