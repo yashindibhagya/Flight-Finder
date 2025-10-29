@@ -8,6 +8,7 @@ import {
     Alert,
     Image,
     ScrollView,
+    StatusBar,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -109,75 +110,89 @@ const TabIndex = () => {
         }
     };
 
-    const renderFlightCard = (flight) => (
-        <TouchableOpacity
-            key={flight.id}
-            style={styles.flightCard}
-            onPress={() => router.push(`/details/${flight.id}`)}
-        >
-            <View style={styles.cardHeader}>
-                <Text weight="semiBold" style={styles.priceText}>
-                    {flight.price}
-                </Text>
-                <MaterialIcons name="flight-takeoff" size={24} color="#0E2A47" />
+    const renderFlightCard = (flight, index) => (
+        <View key={flight.id || index} style={styles.flightCard}>
+            <View style={styles.flightHeader}>
+                <View>
+                    <Text style={styles.airline}>{flight.airline || 'Qatar Airways'}</Text>
+                    <View style={styles.flightTime}>
+                        <Text style={styles.time}>08:00</Text>
+                        <View style={styles.flightPath}>
+                            <View style={styles.flightDot}></View>
+                            <View style={styles.flightLine}></View>
+                            <View style={styles.flightDot}></View>
+                        </View>
+                        <Text style={styles.time}>11:00</Text>
+                    </View>
+                    <Text style={styles.flightRoute}>DEL - BOM</Text>
+                </View>
+                <View style={styles.priceContainer}>
+                    <Text style={styles.price}>₹{flight.price || '3,517'}</Text>
+                    <Text style={styles.priceLabel}>Price per person</Text>
+                </View>
             </View>
-            <View style={styles.cardDetailRow}>
-                <Text style={styles.detailLabel}>Duration:</Text>
-                <Text weight="medium">{flight.duration}</Text>
+            <View style={styles.flightDetails}>
+                <View style={styles.detailItem}>
+                    <MaterialIcons name="flight-takeoff" size={16} color="#666" />
+                    <Text style={styles.detailText}>Non-stop</Text>
+                </View>
+                <View style={styles.detailItem}>
+                    <MaterialIcons name="schedule" size={16} color="#666" />
+                    <Text style={styles.detailText}>3h 00m</Text>
+                </View>
+                <View style={styles.detailItem}>
+                    <MaterialIcons name="airplanemode-active" size={16} color="#666" />
+                    <Text style={styles.detailText}>Boeing 787</Text>
+                </View>
             </View>
-            <View style={styles.cardDetailRow}>
-                <Text style={styles.detailLabel}>Stops:</Text>
-                <Text weight="medium">{flight.stops}</Text>
+            <View style={styles.flightFooter}>
+                <View style={styles.departureInfo}>
+                    <Text style={styles.departureTime}>08:00</Text>
+                    <Text style={styles.departureDate}>Mon, 15 Nov</Text>
+                </View>
+                <View style={styles.separator}>
+                    <View style={styles.separatorLine} />
+                    <View style={styles.planeIcon}>
+                        <MaterialIcons name="flight" size={16} color="#0E2A47" />
+                    </View>
+                </View>
+                <View style={styles.arrivalInfo}>
+                    <Text style={styles.arrivalTime}>11:00</Text>
+                    <Text style={styles.arrivalDate}>Mon, 15 Nov</Text>
+                </View>
+                <TouchableOpacity style={styles.bookButton}>
+                    <Text style={styles.bookButtonText}>Book Now</Text>
+                </TouchableOpacity>
             </View>
-            <View style={styles.cardDetailRow}>
-                <Text style={styles.detailLabel}>Airline:</Text>
-                <Text weight="medium">{flight.airline}</Text>
-            </View>
-        </TouchableOpacity>
+        </View>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.headerContainer}>
-                {/* Top Blue Header */}
-                <View style={styles.topHeader}>
-                    <View style={styles.headerContent}>
-                        <View style={styles.logoContainer}>
-                            <Image
-                                source={require("../../assets/images/wingairplane.jpg")}
-                                style={styles.logo}
-                                contentFit="contain"
-                            />
-                        </View>
-                        <View style={styles.headerTextContainer}>
-                            <Text style={styles.greeting}>Good Morning</Text>
-                            <Text style={styles.userName}>{userName}</Text>
-                        </View>
-                        <TouchableOpacity style={styles.profilePic}>
-                            <MaterialIcons name="person-outline" size={24} color="#fff" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                
-                {/* Search Form */}
-                <View style={styles.searchFormContainer}>
-                    <Text style={styles.searchTitle}>Where would you like to go?</Text>
-                    <Text style={styles.searchSubtitle}>Discover your next adventure</Text>
-                    
-                    <View style={styles.searchBox}>
-                        <MaterialIcons name="search" size={24} color="#666" />
-                        <TextInput
-                            style={styles.searchInput}
-                            placeholder="Search for a destination..."
-                            placeholderTextColor="#999"
+            <StatusBar backgroundColor="#ffffffff" barStyle="dark-content" />
+            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+                {/* Header */}
+                <View style={styles.header}>
+                    <View style={styles.logoContainer}>
+                        <Image
+                            source={require("../../assets/images/wingairplane.jpg")}
+                            style={styles.upperImage}
+                            contentFit="contain"
                         />
                     </View>
+
+                    <View style={styles.headerRight}>
+                        <Text style={styles.greeting}>Good Morning</Text>
+                        <Text style={styles.userName}>{userName}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.profilePic}>
+                        <MaterialIcons name="person-outline" size={24} color="#0E2A47" />
+                    </TouchableOpacity>
                 </View>
-            </View>
-            
-            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+
 
                 {/* Title */}
+                <Text style={styles.title}>Securely Book{"\n"}Your Flight Ticket</Text>
 
                 {/* Search Form */}
                 <View style={styles.form}>
@@ -355,16 +370,17 @@ const TabIndex = () => {
                     </Text>
 
                     {loading ? (
-                        <ActivityIndicator size="large" color="#fff" style={{ marginTop: 15 }} />
+                        <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
                     ) : results.length > 0 ? (
-                        results.map(renderFlightCard)
+                        results.map((flight, index) => renderFlightCard(flight, index))
                     ) : isSearching ? (
                         <Text style={styles.noResults}>No flights found. Try a different route.</Text>
                     ) : (
-                        <View style={styles.flightCard}>
-                            <Text style={styles.airline}>Qatar Airways</Text>
-                            <Text style={styles.price}>₹3,517</Text>
-                        </View>
+                        // Sample flight cards when no search has been performed
+                        <>
+                            {renderFlightCard({}, 1)}
+                            {renderFlightCard({ price: '4,215', airline: 'IndiGo' }, 2)}
+                        </>
                     )}
                 </View>
             </ScrollView>
@@ -375,97 +391,38 @@ const TabIndex = () => {
 export default TabIndex;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#f5f5f5" },
-    scroll: { padding: 0, paddingBottom: 20 },
-    headerContainer: {
-        backgroundColor: '#0E2A47',
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-        paddingBottom: 20,
-        marginBottom: 20,
-    },
-    topHeader: {
-        paddingTop: 20,
-        paddingHorizontal: 20,
-    },
-    headerContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 20,
-    },
-    headerTextContainer: {
-        flex: 1,
-        marginLeft: 15,
-    },
+    container: { flex: 1, backgroundColor: "#f7f7f7ff" },
+    scroll: { padding: 20 },
     header: { flexDirection: "row", justifyContent: "space-between", marginBottom: 25 },
-    greeting: { 
-        color: "rgba(255, 255, 255, 0.8)", 
-        fontSize: 14,
-        marginBottom: 2,
-    },
-    userName: { 
-        color: "#fff", 
-        fontSize: 16, 
-        fontWeight: "600" 
-    },
+    greeting: { color: "#000", fontSize: 14 },
+    userName: { color: "#000", fontSize: 18, fontWeight: "bold" },
     profilePic: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
+        backgroundColor: "#fff",
         justifyContent: "center",
         alignItems: "center",
     },
     logoContainer: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        width: 100,
+        height: 40,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'flex-start',
     },
-    logo: {
-        width: 30,
-        height: 30,
-        tintColor: '#fff',
+    upperImage: {
+        width: 600,
+        height: 700,
+        //top: -100,
+        left: -200,
+        //resizeMode: 'contain',
     },
-    searchFormContainer: {
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
-    searchTitle: {
-        color: '#fff',
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    searchSubtitle: {
-        color: 'rgba(255, 255, 255, 0.8)',
-        fontSize: 14,
-        marginBottom: 20,
-    },
-    searchBox: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        height: 50,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    searchInput: {
-        flex: 1,
-        marginLeft: 10,
-        fontSize: 16,
-        color: '#333',
+    headerRight: {
+        alignItems: "left",
+        marginLeft: -340
     },
     title: {
-        color: "#fff",
+        color: "#000",
         fontSize: 22,
         fontWeight: "bold",
         marginBottom: 25,
@@ -509,7 +466,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#0E2A47',
     },
     radioText: {
-        color: '#666',
+        color: '#000',
         fontWeight: '500',
     },
     radioTextActive: {
@@ -547,26 +504,166 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-    upcoming: { marginTop: 10 },
-    upcomingTitle: { color: "#fff", fontWeight: "600", fontSize: 16, marginBottom: 10 },
+    upcoming: { 
+        marginTop: 10,
+        paddingHorizontal: 5,
+    },
+    upcomingTitle: { 
+        color: "#000", 
+        fontWeight: "600", 
+        fontSize: 18, 
+        marginBottom: 15,
+        paddingLeft: 5,
+    },
     flightCard: {
-        flexDirection: "row",
-        justifyContent: "space-between",
         backgroundColor: "#fff",
         borderRadius: 15,
         padding: 15,
-        marginTop: 10,
+        marginBottom: 15,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
     },
-    airline: { color: "#0E2A47", fontWeight: "600" },
-    price: { color: "#0E2A47", fontWeight: "bold" },
-    cardHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
+    flightHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+        paddingBottom: 15,
+    },
+    airline: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
         marginBottom: 5,
     },
-    priceText: { fontSize: 18, color: "#0E2A47", fontWeight: "bold" },
-    cardDetailRow: { flexDirection: "row", justifyContent: "space-between" },
-    detailLabel: { color: "#555", fontSize: 14 },
+    flightTime: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    time: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#0E2A47',
+    },
+    flightPath: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 10,
+    },
+    flightDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: '#0E2A47',
+    },
+    flightLine: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#ddd',
+    },
+    flightRoute: {
+        fontSize: 14,
+        color: '#666',
+    },
+    priceContainer: {
+        alignItems: 'flex-end',
+    },
+    price: {
+        fontSize: 20,
+        fontWeight: '700',
+        color: '#0E2A47',
+        marginBottom: 2,
+    },
+    priceLabel: {
+        fontSize: 12,
+        color: '#999',
+    },
+    flightDetails: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 15,
+        paddingBottom: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    detailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    detailText: {
+        marginLeft: 5,
+        fontSize: 13,
+        color: '#666',
+    },
+    flightFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    departureInfo: {
+        alignItems: 'flex-start',
+    },
+    arrivalInfo: {
+        alignItems: 'flex-end',
+    },
+    departureTime: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    departureDate: {
+        fontSize: 12,
+        color: '#999',
+        marginTop: 2,
+    },
+    arrivalTime: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    arrivalDate: {
+        fontSize: 12,
+        color: '#999',
+        marginTop: 2,
+    },
+    separator: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 10,
+    },
+    separatorLine: {
+        height: 1,
+        backgroundColor: '#ddd',
+        width: '100%',
+        position: 'relative',
+    },
+    planeIcon: {
+        position: 'absolute',
+        backgroundColor: '#fff',
+        padding: 5,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#eee',
+    },
+    bookButton: {
+        backgroundColor: '#0E2A47',
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        borderRadius: 15,
+    },
+    bookButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
+    },
     noResults: { color: "#BFD6FF", textAlign: "center", marginTop: 20 },
     suggestionsContainer: {
         backgroundColor: "#fff",
