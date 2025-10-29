@@ -1,64 +1,21 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { getAuth, signOut } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../config/firebaseConfig';
 
 const Profile = () => {
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const auth = getAuth();
     const router = useRouter();
+    const [user, setUser] = useState({
+        id: '1',
+        name: 'Demo User',
+        email: 'demo@example.com',
+        phone: 'Not provided'
+    });
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const currentUser = auth.currentUser;
-                if (currentUser) {
-                    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-                    if (userDoc.exists()) {
-                        setUser({
-                            id: currentUser.uid,
-                            email: currentUser.email,
-                            ...userDoc.data()
-                        });
-                    } else {
-                        setUser({
-                            id: currentUser.uid,
-                            email: currentUser.email,
-                            name: currentUser.displayName || 'User',
-                            phone: currentUser.phoneNumber || 'Not provided'
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserData();
-    }, []);
-
-    const handleSignOut = async () => {
-        try {
-            await signOut(auth);
-            router.replace('/auth/login');
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
+    const handleSignOut = () => {
+        // Handle sign out logic here
+        router.replace('/auth/login');
     };
-
-    if (loading) {
-        return (
-            <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#0A3D3F" />
-            </View>
-        );
-    }
 
     return (
         <ScrollView style={styles.container}>
