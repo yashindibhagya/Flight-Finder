@@ -1,6 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import DateTimePicker from '@react-native-community/datetimepicker';
-//import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -85,14 +84,11 @@ const TabIndex = () => {
         setShowDestinationSuggestions(false);
     };
 
-    // Fetch upcoming flights from user's bookings
     const fetchUpcomingFlights = async () => {
-        if (isSearching) return; // Don't fetch if we're in search mode
+        if (isSearching) return;
 
         setIsLoadingBookings(true);
         try {
-            // In a real app, you would fetch this from your backend
-            // For now, we'll use the same sample data as in bookings.jsx
             const sampleBooking = {
                 id: `booking_${Date.now()}`,
                 airline: 'SkyWings',
@@ -119,14 +115,12 @@ const TabIndex = () => {
             setUpcomingFlights([sampleBooking]);
         } catch (error) {
             console.error('Error fetching upcoming flights:', error);
-            // In case of error, show no flights instead of sample data
             setUpcomingFlights([]);
         } finally {
             setIsLoadingBookings(false);
         }
     };
 
-    // Load upcoming flights when component mounts and when not searching
     useEffect(() => {
         if (!isSearching) {
             fetchUpcomingFlights();
@@ -219,11 +213,10 @@ const TabIndex = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar backgroundColor="#ffffffff" barStyle="dark-content" />
+            <StatusBar backgroundColor="#ffffff" barStyle="dark-content" />
             <ScrollView
                 keyboardShouldPersistTaps="handled"
-                contentInset={{ bottom: 80 }}
-                contentContainerStyle={{ ...styles.scroll, paddingBottom: 80 }}
+                contentContainerStyle={styles.scroll}
             >
                 {/* Header */}
                 <View style={styles.header}>
@@ -231,7 +224,6 @@ const TabIndex = () => {
                         <Image
                             source={require("../../assets/images/wingairplane.jpg")}
                             style={styles.upperImage}
-                            contentFit="contain"
                         />
                     </View>
 
@@ -239,12 +231,13 @@ const TabIndex = () => {
                         <Text style={styles.greeting}>Good Morning</Text>
                         <Text style={styles.userName}>{userName}</Text>
                     </View>
-                    <TouchableOpacity style={styles.profilePic}
-                        onPress={() => router.push('/(tabs)/profile')}>
+                    <TouchableOpacity
+                        style={styles.profilePic}
+                        onPress={() => router.push('/(tabs)/profile')}
+                    >
                         <MaterialIcons name="person-outline" size={24} color="#0E2A47" />
                     </TouchableOpacity>
                 </View>
-
 
                 {/* Title */}
                 <Text style={styles.title}>Securely Book{"\n"}Your Flight Ticket</Text>
@@ -323,11 +316,9 @@ const TabIndex = () => {
                     <View style={styles.dateRow}>
                         <View style={[styles.inputGroup, styles.dateInputGroup]}>
                             <MaterialIcons name="calendar-today" size={18} color="#0E2A47" />
-                            <View style={{ flex: 1, marginLeft: 10 }}>
+                            <View style={styles.dateInputInner}>
                                 <Text style={styles.dateLabel}>Departure</Text>
-                                <TouchableOpacity
-                                    onPress={() => setShowDatePicker(true)}
-                                >
+                                <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                                     <Text style={styles.dateText}>
                                         {departDate.toDateString()}
                                     </Text>
@@ -341,7 +332,6 @@ const TabIndex = () => {
                                             setShowDatePicker(false);
                                             if (selectedDate) {
                                                 setDepartDate(selectedDate);
-                                                // If return date is before departure date, update it
                                                 if (selectedDate > returnDate) {
                                                     setReturnDate(selectedDate);
                                                 }
@@ -353,15 +343,13 @@ const TabIndex = () => {
                             </View>
                         </View>
 
-                        {/* Return Date - Only show for round trip */}
+                        {/* Return Date */}
                         {tripType === 'roundtrip' && (
-                            <View style={[styles.inputGroup, styles.dateInputGroup, { marginLeft: 10 }]}>
+                            <View style={[styles.inputGroup, styles.dateInputGroup, styles.returnDateGroup]}>
                                 <MaterialIcons name="calendar-today" size={18} color="#0E2A47" />
-                                <View style={{ flex: 1, marginLeft: 10 }}>
+                                <View style={styles.dateInputInner}>
                                     <Text style={styles.dateLabel}>Return</Text>
-                                    <TouchableOpacity
-                                        onPress={() => setShowReturnDatePicker(true)}
-                                    >
+                                    <TouchableOpacity onPress={() => setShowReturnDatePicker(true)}>
                                         <Text style={styles.dateText}>
                                             {returnDate.toDateString()}
                                         </Text>
@@ -388,7 +376,7 @@ const TabIndex = () => {
                     {/* Passengers */}
                     <View style={styles.inputGroup}>
                         <MaterialIcons name="person-outline" size={20} color="#0E2A47" />
-                        <View style={{ flex: 1, marginLeft: 10 }}>
+                        <View style={styles.passengerContainer}>
                             <Text style={styles.dateLabel}>Passengers</Text>
                             <View style={styles.passengerSelector}>
                                 <TouchableOpacity
@@ -435,10 +423,9 @@ const TabIndex = () => {
                     </View>
 
                     {isSearching ? (
-                        // Show search results
                         <>
                             {loading ? (
-                                <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
+                                <ActivityIndicator size="large" color="#0E2A47" style={styles.loader} />
                             ) : results.length > 0 ? (
                                 results.map((flight, index) => renderFlightCard(flight, index))
                             ) : (
@@ -446,21 +433,13 @@ const TabIndex = () => {
                             )}
                         </>
                     ) : (
-                        // Show upcoming flights
                         <>
                             {isLoadingBookings ? (
-                                <ActivityIndicator size="large" color="#0E2A47" style={{ marginTop: 15 }} />
+                                <ActivityIndicator size="large" color="#0E2A47" style={styles.loader} />
                             ) : upcomingFlights.length > 0 ? (
                                 upcomingFlights.map((flight, index) => renderFlightCard({
                                     ...flight,
-                                    // Map booking data to match the flight card props
                                     price: typeof flight.price === 'number' ? `$${flight.price}` : flight.price,
-                                    departureTime: flight.departure?.time,
-                                    arrivalTime: flight.arrival?.time,
-                                    origin: flight.departure?.code,
-                                    destination: flight.arrival?.code,
-                                    date: flight.departure?.date,
-                                    // Add any other required mappings
                                 }, index))
                             ) : (
                                 <View style={styles.noUpcomingContainer}>
@@ -479,16 +458,9 @@ const TabIndex = () => {
 
 export default TabIndex;
 
-// Helper function to format date
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const options = { weekday: 'short', day: '2-digit', month: 'short' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-};
-
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#f7f7f7ff" },
-    scroll: { padding: 20 },
+    container: { flex: 1, backgroundColor: "#f7f7f7" },
+    scroll: { padding: 20, paddingBottom: 100 },
     header: { flexDirection: "row", justifyContent: "space-between", marginBottom: 25 },
     greeting: { color: "#000", fontSize: 14 },
     userName: { color: "#000", fontSize: 18, fontWeight: "bold" },
@@ -509,12 +481,10 @@ const styles = StyleSheet.create({
     upperImage: {
         width: 600,
         height: 700,
-        //top: -100,
         left: -200,
-        //resizeMode: 'contain',
     },
     headerRight: {
-        alignItems: "left",
+        alignItems: "flex-start",
         marginLeft: -340
     },
     title: {
@@ -540,9 +510,10 @@ const styles = StyleSheet.create({
         height: 55,
     },
     input: { flex: 1, marginLeft: 10, fontSize: 15, color: "#000" },
-    dateInput: { flex: 1, justifyContent: 'center' },
     dateRow: { flexDirection: 'row', marginBottom: 15 },
     dateInputGroup: { flex: 1, height: 'auto', paddingVertical: 10 },
+    returnDateGroup: { marginLeft: 10 },
+    dateInputInner: { flex: 1, marginLeft: 10 },
     dateLabel: { fontSize: 12, color: '#666', marginBottom: 2 },
     dateText: { fontSize: 15, color: '#000' },
     radioGroup: {
@@ -568,6 +539,7 @@ const styles = StyleSheet.create({
     radioTextActive: {
         color: '#fff',
     },
+    passengerContainer: { flex: 1, marginLeft: 10 },
     passengerSelector: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -604,13 +576,28 @@ const styles = StyleSheet.create({
         marginTop: 10,
         paddingHorizontal: 5,
     },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 15,
+        paddingLeft: 5,
+    },
     upcomingTitle: {
         color: "#000",
         fontWeight: "600",
         fontSize: 18,
-        marginBottom: 15,
-        paddingLeft: 5,
     },
+    viewAllButton: {
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+    },
+    viewAllText: {
+        color: "#0E2A47",
+        fontSize: 14,
+        fontWeight: "500",
+    },
+    loader: { marginTop: 15 },
     flightCard: {
         backgroundColor: "#fff",
         borderRadius: 15,
@@ -760,7 +747,27 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
     },
-    noResults: { color: "#BFD6FF", textAlign: "center", marginTop: 20 },
+    noResults: {
+        color: "#999",
+        textAlign: "center",
+        marginTop: 20,
+        fontSize: 14,
+    },
+    noUpcomingContainer: {
+        alignItems: 'center',
+        paddingVertical: 40,
+    },
+    noUpcomingText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+        marginTop: 15,
+    },
+    noUpcomingSubtext: {
+        fontSize: 14,
+        color: '#999',
+        marginTop: 5,
+    },
     suggestionsContainer: {
         backgroundColor: "#fff",
         borderRadius: 10,
@@ -769,6 +776,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#E0E0E0",
     },
-    suggestionItem: { padding: 10 },
-    suggestionTitle: { color: "#0E2A47" },
+    suggestionItem: {
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F5F5F5',
+    },
+    suggestionTitle: {
+        color: "#0E2A47",
+        fontSize: 14,
+    },
 });
