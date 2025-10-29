@@ -504,14 +504,14 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-    upcoming: { 
+    upcoming: {
         marginTop: 10,
         paddingHorizontal: 5,
     },
-    upcomingTitle: { 
-        color: "#000", 
-        fontWeight: "600", 
-        fontSize: 18, 
+    upcomingTitle: {
+        color: "#000",
+        fontWeight: "600",
+        fontSize: 18,
         marginBottom: 15,
         paddingLeft: 5,
     },

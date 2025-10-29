@@ -20,7 +20,7 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarStyle: {
           position: 'absolute',
-          bottom: 20,
+          bottom: 30,
           alignSelf: 'center',
           width: '85%',
           maxWidth: 350,
@@ -41,6 +41,7 @@ export default function TabLayout() {
           shadowRadius: 16,
           alignItems: 'center',
           justifyContent: 'center',
+          marginLeft: 30,
         },
         tabBarLabelStyle: {
           display: 'none',
@@ -74,6 +75,7 @@ export default function TabLayout() {
               backgroundColor: focused ? '#FFFFFF' : 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
+              top: 12,
             }}>
               <IconSymbol
                 size={24}
@@ -96,6 +98,7 @@ export default function TabLayout() {
               backgroundColor: focused ? '#FFFFFF' : 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
+              top: 12,
             }}>
               <Fontisto name="plane-ticket" size={24} color={focused ? '#709DBA' : '#FFFFFF'} />
 
@@ -115,6 +118,7 @@ export default function TabLayout() {
               backgroundColor: focused ? '#FFFFFF' : 'transparent',
               justifyContent: 'center',
               alignItems: 'center',
+              top: 12,
             }}>
               <FontAwesome name="user" size={24} color={focused ? '#709DBA' : '#FFFFFF'} />
             </View>
