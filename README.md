@@ -63,14 +63,12 @@ The application requires configuration for both Firebase and the RapidAPI key.
 
 #### 1\. Configure Firebase Services
 
-Update the placeholder credentials in `config/firebaseConfig.jsx` with your actual Firebase project configuration:
-
 ```javascript
 // config/firebaseConfig.jsx
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // <-- Update this
-  authDomain: "YOUR_AUTH_DOMAIN", // <-- Update this
-  projectId: "YOUR_PROJECT_ID", // <-- Update this
+  apiKey: "YOUR_API_KEY", 
+  authDomain: "YOUR_AUTH_DOMAIN", 
+  projectId: "YOUR_PROJECT_ID",
   // ...other fields
 };
 ```
