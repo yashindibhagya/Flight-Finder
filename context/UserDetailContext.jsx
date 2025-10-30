@@ -1,6 +1,4 @@
 import React, { createContext, useContext, useState } from "react";
-
-// Create a context to manage user details
 export const UserDetailContext = createContext();
 
 /**
@@ -11,8 +9,7 @@ export const UserDetailProvider = ({ children }) => {
     const [userDetail, setUserDetail] = useState(null);
     const [isLoading] = useState(false);
 
-    // In UI-only mode, there is no backend. Consumers can set userDetail
-    // directly via setUserDetail if needed.
+
     const getUserDetail = async () => {
         return userDetail;
     };

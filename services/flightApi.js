@@ -144,14 +144,8 @@ export const searchFlights = async ({ origin, destination, departDate }) => {
 // Get booking details by searching for flights with specific criteria
 export const getBookingDetails = async (bookingReference) => {
     if (!RAPIDAPI_KEY) throw new Error('RapidAPI key missing. Set EXPO_PUBLIC_RAPIDAPI_KEY.');
-    
+
     try {
-        // Since we can't fetch by booking reference directly, we'll use a search with sample data
-        // In a real app, you would store the booking details when the booking is made
-        // and retrieve them from your own database
-        
-        // For demo purposes, we'll return sample data that matches our UI
-        // In a production app, you would fetch this from your backend
         return {
             id: `booking_${Date.now()}`,
             airline: 'SkyWings',
@@ -175,14 +169,8 @@ export const getBookingDetails = async (bookingReference) => {
             bookingDate: '10 NOV 2023',
             bookingNumber: bookingReference || `BK${Math.floor(10000000 + Math.random() * 90000000)}`,
         };
-        
-        // Note: In a real implementation, you would either:
-        // 1. Store the full booking details in your own database when the booking is made
-        // 2. Or use a different API endpoint that supports retrieving bookings by reference
-        
     } catch (error) {
         console.error('Error fetching booking details:', error);
-        // Return sample data as fallback
         return {
             id: `booking_${Date.now()}`,
             airline: 'SkyWings',

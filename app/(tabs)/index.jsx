@@ -36,7 +36,6 @@ const TabIndex = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [upcomingFlights, setUpcomingFlights] = useState([]);
     const [isLoadingBookings, setIsLoadingBookings] = useState(false);
-
     const [originSuggestions, setOriginSuggestions] = useState([]);
     const [destinationSuggestions, setDestinationSuggestions] = useState([]);
     const [showOriginSuggestions, setShowOriginSuggestions] = useState(false);
